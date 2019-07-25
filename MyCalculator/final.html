@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>My Calculator</title>
+    <style>
+        button {
+            height: 50px;
+            width: 50px;
+        }
+
+        table {
+            background-color: white;
+            border: 2px solid black;
+            height: 50px;
+            width: 215px;
+        }
+
+        td {
+            text-align: right;
+            padding: 5px;
+        }
+
+        #cal_div {
+            position: absolute;
+            padding: 20px;
+            top: 50%;
+            left: 50%;
+            margin: -190.6px 0 0 -128px;
+        }
+
+        #left_div {
+            position: fixed;
+            left: 10%;
+            width: 300px;
+        }
+
+        #right_div {
+            position: fixed;
+            right: 10%;
+            width: 300px;
+        }
+    </style>
+
+</head>
+
+<body>
+
+    <div id="left_div">
+        <img src="img/main.png" alt="" id="img1">
+        <img src="img/main (2).png" alt="" id="img2">
+        <img src="img/sticker.png" alt="" id="img3">
+    </div>
+
+    <div id="right_div">
+        <img src="img/sticker (2).png" alt="" id="img4">
+        <img src="img/sticker (3).png" alt="" id="img5">
+        <img src="img/sticker (4).png" alt="" id="img6">
+    </div>
+
+    <div id="cal_div">
+        <table>
+            <tr>
+                <td>
+                    <p>
+                        <h5 id="memory_area"></h5>
+                    </p>
+                    <p id="display_area"></p>
+                </td>
+            </tr>
+
+        </table>
+        <br>
+        <button onclick="op_AC()">AC</button>
+        <button onclick="op_C()">C</button>
+        <button onclick="op_Del()">del</button>
+        <br>
+        <button onclick="get_num('7')">7</button>
+        <button onclick="get_num('8')">8</button>
+        <button onclick="get_num('9')">9</button>
+        <button onclick="operation('/')">÷</button>
+        <br>
+        <button onclick="get_num('4')">4</button>
+        <button onclick="get_num('5')">5</button>
+        <button onclick="get_num('6')">6</button>
+        <button onclick="operation('*')">×</button>
+        <br>
+        <button onclick="get_num('1')">1</button>
+        <button onclick="get_num('2')">2</button>
+        <button onclick="get_num('3')">3</button>
+        <button onclick="operation('-')">－</button>
+        <br>
+        <button onclick="get_num('0')">0</button>
+        <button onclick="get_dot()">.</button>
+        <button onclick="operation('=')">=</button>
+        <button onclick="operation('+')">＋</button>
+    </div>
+
+    <script>
+        var plus = 0,
+            addend = 0,
+            temp_num = 0;
+
+        var mem_opr = '',
+            pre_opr = '';
+
+        var str = '0',
+            memory_str = '';
+
+        var display = document.getElementById("display_area");
+        display.innerHTML = str;
+
+        var error = false,
+            check = true,
+            double_click = false;
+
+        function get_num(num) {
+            if (pre_opr == '=') op_AC();
+            if ((str == '0') && (num == '0')) {
+                str = '0';
+            } else {
+                if (str == '0') str = '';
+                str += num;
+            }
+            display.innerHTML = str;
+            double_click = false;
+            check ? plus = parseFloat(str, 10) : addend = parseFloat(str, 10);
+            console.log("getnum:" + "plus " + plus + " addend " + addend);
+        }
+
+        function get_dot() {
+            if (!error) {
+                str += '.';
+                document.getElementById("display_area").innerHTML = str;
+                console.log(str);
+                error = true;
+            } else {
+                alert("Don't input two dot in the calculator!!!");
+            }
+        }
+
+        function operation(opr) {
+            if (double_click) {
+                pre_opr = opr;
+            } else {
+                double_click = true;
+                if (!check) {
+                    if ((pre_opr == '+' || pre_opr == '-') && (opr == '*' || opr == '/')) {
+                        mem_opr = pre_opr;
+                        pre_opr = opr;
+                        temp_num = plus;
+                        plus = addend;
+                        console.log("four_operation:");
+                    } else if (mem_opr != '' && (opr == '+' || opr == '-' || opr == '=')) {
+                        cal(pre_opr);
+                        addend = temp_num;
+                        cal(mem_opr);
+                        mem_opr = '';
+                        temp_num = 0;
+                        pre_opr = opr;
+                        console.log("mem_operation:");
+                    } else {
+                        cal(pre_opr);
+                        pre_opr = opr;
+                        console.log("basic_operation:");
+                    }
+
+                } else {
+                    pre_opr = opr;
+                    check = false;
+                }
+                console.log("operation:" + "plus " + plus + " addend " + addend + " temp_num " + temp_num);
+
+                error=false;
+                addend = 0;
+                str = '0';
+                display.innerHTML = plus.toString();
+            }
+
+        }
+
+        function op_Del() {
+            //刪除一個
+            if (str.length - 1 != 0) {
+                str = str.substring(0, str.length - 1);
+
+            } else {
+                str = "0";
+            }
+            display.innerHTML = str;
+        }
+
+        function op_C() {
+            //清掉目前的數值
+            str = '0';
+            display.innerHTML = str;
+        }
+
+        function op_AC() {
+            //清掉所有東西
+            str = '0';
+            plus = 0;
+            check = true;
+            pre_opr = '';
+            mem_opr = ''
+            error = false;
+            display.innerHTML = str;
+        }
+
+        function cal(opr) {
+            switch (opr) {
+                case '+': {
+                    plus = plus + addend;
+                    break;
+                }
+                case '-': {
+                    plus = plus - addend;
+                    break;
+                }
+                case '*': {
+                    plus = plus * addend;
+                    break;
+                }
+                case '/': {
+                    plus = plus / addend;
+                    break;
+                }
+            }
+        }
+    </script>
+
+</body>
+
+</html>
